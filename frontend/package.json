@@ -7,9 +7,16 @@
     "@types/node": "^10.12.15",
     "@types/react": "^16.7.17",
     "@types/react-dom": "^16.0.11",
+    "@types/uikit": "^2.27.6",
+    "autobind-decorator": "^2.4.0",
+    "classnames": "^2.2.6",
+    "msal": "^0.2.3",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
+    "react-microsoft-login": "^1.0.0",
     "react-scripts": "2.1.1",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^0.84.0",
     "typescript": "^3.2.2"
   },
   "scripts": {
