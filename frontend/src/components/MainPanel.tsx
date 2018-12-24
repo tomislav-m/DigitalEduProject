@@ -1,6 +1,8 @@
 import React from 'react';
 import { Button, Icon } from 'semantic-ui-react';
 import { Mode } from '../App';
+import Professor from './Professor';
+import Student from '../containers/StudentPanelContainer';
 
 interface IMainPanelProps {
   mode: Mode;
@@ -13,14 +15,18 @@ export default class MainPanel extends React.Component<IMainPanelProps, {}> {
   }
 
   public render() {
+    const { mode } = this.props;
+
     return (
       <div>
         <Button icon labelPosition="left" onClick={this.props.onGoBack}>
           Back<Icon name="arrow left" />
         </Button>
-        <p>
-          {Mode[this.props.mode]}
-        </p>
+        {
+          mode === Mode.professors ?
+            <Professor /> :
+            <Student />
+        }
       </div>
     );
   }
