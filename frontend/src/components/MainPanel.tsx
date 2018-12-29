@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Icon } from 'semantic-ui-react';
 import { Mode } from '../App';
-import Professor from './Professor';
+import Professor from '../containers/ProfessorPanelContainer';
 import Student from '../containers/StudentPanelContainer';
 
 interface IMainPanelProps {

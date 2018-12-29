@@ -7,6 +7,11 @@
     padding-bottom: 20px;
 }
 
-.answer-center {
+.question-center {
     text-align: center;
+}
+
+.answer-button {
+    float: right;
+    vertical-align: -webkit-baseline-middle;
 }
