@@ -15,3 +15,7 @@
     float: right;
     vertical-align: -webkit-baseline-middle;
 }
+
+.dropdown_select-subject {
+    margin-bottom: 20px;
+}
