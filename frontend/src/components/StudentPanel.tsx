@@ -1,16 +1,19 @@
 import React from 'react';
-import { Container, Button, Modal, Input, Icon, Loader, Dimmer, Dropdown, DropdownProps } from 'semantic-ui-react';
+import { Button, Modal, Input, Icon, Loader, Dimmer, Dropdown, DropdownProps, Message, Grid } from 'semantic-ui-react';
 import autobind from 'autobind-decorator';
 import './styles.css';
-import { Subject } from '../containers/StudentPanelContainer';
+import { Subject, Question } from '../containers/StudentPanelContainer';
 
 interface IStudentPanelProps {
   answered: boolean;
   answer?: string;
   isAnswerWrong: boolean;
   subjects: Array<Subject>;
+  questions: Array<Question>;
   onGetAnswer(question: string): void;
   onAnswerAction(correct: boolean): void;
+  onSubjectChange(subjectId: number): void;
+  onAskQuestion(subjectId: number, text: string): void;
 }
 
 interface IStudentPanelState {
@@ -72,9 +75,12 @@ export default class StudentPanel extends React.Component<IStudentPanelProps, IS
   @autobind
   private _onDropdownSelect(event: any, data: DropdownProps) {
     const subject = this.props.subjects.filter(x => x.Name === data.value)[0];
-    this.setState({
-      selectedSubject: subject
-    });
+    if (subject) {
+      this.props.onSubjectChange(subject.Id);
+      this.setState({
+        selectedSubject: subject
+      });
+    }
   }
 
   @autobind
@@ -123,10 +129,13 @@ export default class StudentPanel extends React.Component<IStudentPanelProps, IS
 
   @autobind
   private _renderQuestionSent() {
+    const { onAskQuestion } = this.props;
+    const { question, selectedSubject } = this.state;
+    const subjectId = selectedSubject ? selectedSubject.Id : 0;
     return (
       <Modal
         size='small'
-        trigger={<Button color="green"><Icon name="send" /> Send</Button>} //TODO: šalji pitanje profesoru
+        trigger={<Button color="green" onClick={() => onAskQuestion(subjectId, question)}><Icon name="send" /> Send</Button>}
       >
         <Modal.Header>Question sent</Modal.Header>
         <Modal.Content>
@@ -146,64 +155,94 @@ export default class StudentPanel extends React.Component<IStudentPanelProps, IS
     );
   }
 
-  public render() {
+  @autobind
+  private _renderQuestions() {
     return (
       <div>
-        <Dropdown
-          placeholder="Select subject"
-          search selection
-          options={this._mapSubjectsToOptions()}
-          onChange={this._onDropdownSelect}
-          className="dropdown_select-subject"
-        />
-        {this.state.selectedSubject &&
-          <Container className="container-student">
-            <Modal
-              trigger={
-                <Button onClick={this._handleModalOpen} size="big" color="blue">
-                  Ask a question
-            </Button>
-              }
-              size="small"
-              open={this.state.modalOpen}
-              onClose={this._handleModalClose}
-            >
-              <Modal.Header>Ask a question</Modal.Header>
-              <Modal.Content>
-                <Modal.Description>
-                  <p className="description-text">You've got a question? Fire away!</p>
-                </Modal.Description>
-                <Input placeholder="Question..." size="big" fluid onChange={this._handleInputChange} />
-              </Modal.Content>
-              <Modal.Actions>
-                {this._renderAnswerModal()}
-                <Button onClick={this._handleModalClose} color="red">
-                  <Icon name="cancel" /> Cancel
-            </Button>
-              </Modal.Actions>
-            </Modal>
-            <Modal open={this.props.isAnswerWrong}>
-              <Modal.Header>Wrong answer?</Modal.Header>
-              <Modal.Content>
-                <Modal.Description>
-                  <div className="description-text">
-                    Not satisfied with the given answer?
-                Click "Send" to send your question to the staff or "Cancel" and try again.<br />
-                    Your question was:<br />
-                    <p className="answer-center"><strong>"{this.state.question}"</strong></p>
-                  </div>
-                </Modal.Description>
-              </Modal.Content>
-              <Modal.Actions>
-                {this._renderQuestionSent()}
-                <Button onClick={() => this._onAnswer(true)} color="red">
-                  <Icon name="cancel" /> Cancel
-            </Button>
-              </Modal.Actions>
-            </Modal>
-          </Container>
+        {
+          this.props.questions.map(q => {
+            return (
+              <Message
+                header={q.Question}
+                content={q.Answer}
+              />
+            )
+          })
         }
       </div>
+    );
+  }
+
+  public render() {
+    return (
+      <Grid className="container-student">
+        <Grid.Row columns="2">
+          <Grid.Column floated="right">
+            <Dropdown
+              placeholder="Select subject"
+              search selection
+              options={this._mapSubjectsToOptions()}
+              onChange={this._onDropdownSelect}
+              className="dropdown_select-subject"
+            />
+          </Grid.Column>
+          <Grid.Column floated="left">
+            {
+              this.state.selectedSubject &&
+              <div>
+                <Modal
+                  trigger={
+                    <Button onClick={this._handleModalOpen} size="big" color="blue">
+                      Ask a question
+                    </Button>
+                  }
+                  size="small"
+                  open={this.state.modalOpen}
+                  onClose={this._handleModalClose}
+                >
+                  <Modal.Header>Ask a question</Modal.Header>
+                  <Modal.Content>
+                    <Modal.Description>
+                      <p className="description-text">You've got a question? Fire away!</p>
+                    </Modal.Description>
+                    <Input placeholder="Question..." size="big" fluid onChange={this._handleInputChange} />
+                  </Modal.Content>
+                  <Modal.Actions>
+                    {this._renderAnswerModal()}
+                    <Button onClick={this._handleModalClose} color="red">
+                      <Icon name="cancel" /> Cancel
+                    </Button>
+                  </Modal.Actions>
+                </Modal>
+                <Modal open={this.props.isAnswerWrong}>
+                  <Modal.Header>Wrong answer?</Modal.Header>
+                  <Modal.Content>
+                    <Modal.Description>
+                      <div className="description-text">
+                        Not satisfied with the given answer?
+                        Click "Send" to send your question to the staff or "Cancel" and try again.<br />
+                        Your question was:<br />
+                        <p className="answer-center"><strong>"{this.state.question}"</strong></p>
+                      </div>
+                    </Modal.Description>
+                  </Modal.Content>
+                  <Modal.Actions>
+                    {this._renderQuestionSent()}
+                    <Button onClick={() => this._onAnswer(true)} color="red">
+                      <Icon name="cancel" /> Cancel
+                </Button>
+                  </Modal.Actions>
+                </Modal>
+              </div>
+            }
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row centered columns="1">
+          {
+            this._renderQuestions()
+          }
+        </Grid.Row>
+      </Grid>
     );
   }
 }
