@@ -4,26 +4,7 @@ import { askQuestion } from '../data/Answers';
 import StudentPanel from '../components/StudentPanel';
 import { getAllSubjectsAction, getQuestionsAndAnswers, sendQuestion } from '../actions/actions';
 import '../components/styles.css';
-
-export interface Subject {
-  Id: number;
-  Name: string;
-}
-
-export interface Question {
-  Id: number;
-  Question: string;
-  Subject: Subject;
-  Answer: string;
-}
-
-interface QuestionPost {
-  text: string;
-  primary: boolean;
-  subjectId: number;
-  askedBy: number;
-  answerId: number;
-}
+import { Subject, Question, QuestionPost } from '../data/DataStructures';
 
 interface IStudentState {
   answer?: string;
@@ -86,11 +67,10 @@ export default class StudentPanelContainer extends React.Component<{}, IStudentS
   @autobind
   private _onQuestionSend(subjectId: number, question: string) {
     const questionPost: QuestionPost = {
-      subjectId,
-      askedBy: 1,
-      primary: false,
-      answerId: 1,
-      text: question
+      SubjectId: subjectId,
+      AskedBy: 1,
+      Primary: false,
+      Text: question
     };
     sendQuestion(questionPost);
   }

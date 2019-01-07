@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Modal, Input, Icon, Loader, Dimmer, Dropdown, DropdownProps, Message, Grid } from 'semantic-ui-react';
 import autobind from 'autobind-decorator';
 import './styles.css';
-import { Subject, Question } from '../containers/StudentPanelContainer';
+import { Subject, Question } from '../data/DataStructures';
 
 interface IStudentPanelProps {
   answered: boolean;

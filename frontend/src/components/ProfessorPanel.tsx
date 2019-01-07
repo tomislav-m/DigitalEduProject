@@ -1,8 +1,9 @@
 import React from 'react';
-import { Container, List, Segment, Button, Icon } from 'semantic-ui-react';
+import { Container, Segment, Button, Icon } from 'semantic-ui-react';
+import { QuestionPost } from '../data/DataStructures';
 
 interface IStudentProps {
-  questions: Array<string>;
+  questions: Array<QuestionPost>;
 }
 
 export default class ProfessorPanel extends React.Component<IStudentProps, {}> {
@@ -18,7 +19,7 @@ export default class ProfessorPanel extends React.Component<IStudentProps, {}> {
           questions.map((q, index) => {
             return (
               <Segment key={index} className="question-center" clearing>
-                {q}
+                {q.Text}
                 <Button floated="right" color="green">
                   <Icon name="exclamation" /> Answer
                 </Button>

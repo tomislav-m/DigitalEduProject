@@ -26,9 +26,13 @@ namespace DigObr.Controllers
         
         //neodgovorena pitanja za profesora
         [ActionName("Unanswered")]
-        public IQueryable<Question> GetUnansweredQuestions(int id)
+        public IQueryable<Question> GetUnansweredQuestions(int? id)
         {
-            return db.Questions.Where(q => q.AnswerId == null && q.SubjectId == id);
+            if (id.HasValue)
+            {
+                return db.Questions.Where(q => q.AnswerId == null && q.SubjectId == id);
+            }
+            return db.Questions.Where(q => q.AnswerId == null);
         }
         
         //odgovorena pitanja za studenta

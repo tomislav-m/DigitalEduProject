@@ -34,5 +34,5 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "proxy": "http://digobr20181229043513.azurewebsites.net/api"
+  "proxy": "http://localhost:54133/api"
 }

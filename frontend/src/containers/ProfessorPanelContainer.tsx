@@ -1,10 +1,11 @@
 import React from 'react';
 import autobind from 'autobind-decorator';
-import { getQuestions } from '../data/Questions';
 import ProfessorPanel from '../components/ProfessorPanel';
+import { getUnansweredQuestions } from '../actions/actions';
+import { QuestionPost } from '../data/DataStructures';
 
 interface IProfessorState {
-  questions: Array<string>;
+  questions: Array<QuestionPost>;
 }
 
 export default class ProfessorPanelContainer extends React.Component<{}, IProfessorState> {
@@ -18,10 +19,10 @@ export default class ProfessorPanelContainer extends React.Component<{}, IProfes
 
   @autobind
   private _getQuestions() {
-    const questions = getQuestions();
-
-    this.setState({
-      questions
+    getUnansweredQuestions().then(questions => {
+      this.setState({
+        questions
+      });
     });
   }
 
