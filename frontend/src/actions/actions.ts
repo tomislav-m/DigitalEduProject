@@ -6,6 +6,7 @@ const newQuestionUrl = "/questions/new";
 const unansweredQuestionsUrl = "/questions/unanswered?id=";
 const answerUrl = "/answers/new";
 const editQuestionUrl = "/questions/edit/";
+const answeredQuestionsUrl = "/questions/answered?username=";
 
 export function getAllSubjectsAction() {
   return genericFetch(subjectsUrl);
@@ -17,6 +18,10 @@ export function getQuestionsAndAnswers(subjectId: number) {
 
 export function getUnansweredQuestions(subjectId?: number) {
   return genericFetch(unansweredQuestionsUrl, subjectId);
+}
+
+export function getNotifications(username: string) {
+  return genericFetch(answeredQuestionsUrl, username);
 }
 
 export function sendQuestion(question: any) {

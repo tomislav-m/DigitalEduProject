@@ -1,15 +1,18 @@
 import React from 'react';
 import MicrosoftLogin from "react-microsoft-login";
 import autobind from 'autobind-decorator';
-import { Menu, Container, Button } from 'semantic-ui-react';
+import { Menu, Container, Button, Popup } from 'semantic-ui-react';
 import './App.css';
 import 'semantic-ui-css/semantic.min.css'
 import MainPanel from './components/MainPanel';
+import { getNotifications } from './actions/actions';
+import { Question } from './data/DataStructures';
 
 interface IAppState {
   isLoggedIn: boolean;
   mode?: Mode;
   user?: UserData;
+  questions: Array<Question>;
 }
 
 export enum Mode {
@@ -28,8 +31,15 @@ interface UserData {
 
 class App extends React.Component<{}, IAppState> {
   public state: IAppState = {
-    isLoggedIn: false
+    isLoggedIn: false,
+    questions: []
   };
+
+  public componentDidUpdate({ }, prevState: IAppState) {
+    if (this.state.user != prevState.user) {
+      this._getNotifications();
+    }
+  }
 
   @autobind
   private _onLogin(error: any, authData: any) {
@@ -51,14 +61,24 @@ class App extends React.Component<{}, IAppState> {
 
   @autobind
   private _resetMode() {
-    if(this.state.mode) {
+    if (this.state.mode) {
       this.setState({ mode: undefined });
     }
   }
 
   @autobind
+  private _getNotifications() {
+    this.state.user && getNotifications(this.state.user.mail.toLocaleLowerCase()).then(notifications => {
+      this.setState({
+        questions: notifications
+      });
+    });
+  }
+
+  @autobind
   private _renderNavigation() {
-    const { isLoggedIn, user } = this.state;
+    const { isLoggedIn, user, questions } = this.state;
+    const message = `${questions.length > 0 ? questions.length + " new" : "No new"} answers to your questions`;
     return (
       <div>
         <Menu fixed="top" inverted>
@@ -69,6 +89,13 @@ class App extends React.Component<{}, IAppState> {
             {isLoggedIn && user &&
               <Menu.Item position="right">
                 {`Hello ${user.givenName} ${user.surname}`}
+                <Popup
+                  basic
+                  content={message}
+                  trigger={
+                    <Button className="notification-button">{questions.length}</Button>
+                  }
+                />
               </Menu.Item>
             }
           </Container>

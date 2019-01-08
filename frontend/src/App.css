@@ -5,3 +5,9 @@
 .content-container {
   padding-top: 6em;
 }
+
+.notification-button {
+  font-size: 15px !important;
+  margin-left: 8px !important;
+  padding: 7px 11px 7px 11px !important
+}
