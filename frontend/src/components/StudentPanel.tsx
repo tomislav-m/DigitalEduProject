@@ -95,7 +95,7 @@ export default class StudentPanel extends React.Component<IStudentPanelProps, IS
             onClick={() => this.props.onGetAnswer(this.state.question)}
           >
             <Icon name="question" /> Ask
-        </Button>
+          </Button>
         }
       >
         <Modal.Header>Answer</Modal.Header>
