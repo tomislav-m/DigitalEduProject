@@ -1,8 +1,7 @@
 import React from 'react';
 import autobind from 'autobind-decorator';
-import { askQuestion } from '../data/Answers';
 import StudentPanel from '../components/StudentPanel';
-import { getAllSubjectsAction, getQuestionsAndAnswers, sendQuestion } from '../actions/actions';
+import { getAllSubjectsAction, getQuestionsAndAnswers, sendQuestion, askQuestion } from '../actions/actions';
 import '../components/styles.css';
 import { Subject, Question, QuestionPost } from '../data/DataStructures';
 
@@ -34,17 +33,14 @@ export default class StudentPanelContainer extends React.Component<{}, IStudentS
   }
 
   @autobind
-  private _getAnswer(question: string) {
+  private _getAnswer(subjectId: number | undefined, question: string) {
     if (this.state.answered) return;
-    const answer = askQuestion(question);
-
-    setTimeout(() => {
+    subjectId && askQuestion(subjectId, question).then(answer => {
       this.setState({
         answer,
         answered: true
-      })
-    },
-      2000);
+      });
+    });
   }
 
   @autobind

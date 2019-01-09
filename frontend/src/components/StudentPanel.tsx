@@ -10,7 +10,7 @@ interface IStudentPanelProps {
   isAnswerWrong: boolean;
   subjects: Array<Subject>;
   questions: Array<Question>;
-  onGetAnswer(question: string): void;
+  onGetAnswer(subjectId: number | undefined, question: string): void;
   onAnswerAction(correct: boolean): void;
   onSubjectChange(subjectId: number): void;
   onAskQuestion(subjectId: number, text: string): void;
@@ -85,6 +85,7 @@ export default class StudentPanel extends React.Component<IStudentPanelProps, IS
 
   @autobind
   private _renderAnswerModal() {
+    const selectedSubject = this.state.selectedSubject;
     return (
       <Modal
         size='small'
@@ -92,7 +93,7 @@ export default class StudentPanel extends React.Component<IStudentPanelProps, IS
           <Button
             color="green"
             disabled={this.state.question.length === 0}
-            onClick={() => this.props.onGetAnswer(this.state.question)}
+            onClick={() => this.props.onGetAnswer(selectedSubject && selectedSubject.Id, this.state.question)}
           >
             <Icon name="question" /> Ask
           </Button>

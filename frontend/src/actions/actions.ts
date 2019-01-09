@@ -7,6 +7,11 @@ const unansweredQuestionsUrl = "/questions/unanswered?id=";
 const answerUrl = "/answers/new";
 const editQuestionUrl = "/questions/edit/";
 const answeredQuestionsUrl = "/questions/answered?username=";
+const askQuestionUrl = "/dialogflow/ask?";
+
+export function askQuestion(subjectId: number, question: string) {
+  return genericFetch(askQuestionUrl + `subjectId=${subjectId}&question=${question}`);
+}
 
 export function getAllSubjectsAction() {
   return genericFetch(subjectsUrl);
