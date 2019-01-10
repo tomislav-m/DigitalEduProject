@@ -10,14 +10,15 @@ import { Question } from './data/DataStructures';
 
 interface IAppState {
   isLoggedIn: boolean;
-  mode?: Mode;
+  task?: Task;
   user?: UserData;
   questions: Array<Question>;
 }
 
-export enum Mode {
-  'professors' = 1,
-  'students' = 2
+export enum Task {
+  'FAQ' = 1,
+  'AAOEQ' = 2,
+  'DT2DF' = 3
 }
 
 interface UserData {
@@ -55,14 +56,14 @@ class App extends React.Component<{}, IAppState> {
   }
 
   @autobind
-  private _onModeSet(mode: Mode) {
-    this.setState({ mode });
+  private _onTaskSet(task: Task) {
+    this.setState({ task });
   }
 
   @autobind
-  private _resetMode() {
-    if (this.state.mode) {
-      this.setState({ mode: undefined });
+  private _resetTask() {
+    if (this.state.task) {
+      this.setState({ task: undefined });
     }
   }
 
@@ -83,7 +84,7 @@ class App extends React.Component<{}, IAppState> {
       <div>
         <Menu fixed="top" inverted>
           <Container>
-            <Menu.Item as='a' header onClick={this._resetMode}>
+            <Menu.Item as='a' header onClick={this._resetTask}>
               Dialogflow Project
             </Menu.Item>
             {isLoggedIn && user &&
@@ -105,7 +106,7 @@ class App extends React.Component<{}, IAppState> {
   }
 
   render() {
-    const { isLoggedIn, mode } = this.state;
+    const { isLoggedIn, task } = this.state;
     let content: any;
 
     if (!isLoggedIn) {
@@ -117,14 +118,15 @@ class App extends React.Component<{}, IAppState> {
             withUserData={true}
           />
         </div>
-    } else if (mode) {
+    } else if (task) {
       content =
-        <MainPanel onGoBack={this._resetMode} mode={mode} />;
+        <MainPanel onGoBack={this._resetTask} task={task} />;
     } else {
       content =
         <div className="loginButton">
-          <Button size="huge" content="Professors" onClick={() => this._onModeSet(Mode.professors)} />
-          <Button size="huge" content="Students" onClick={() => this._onModeSet(Mode.students)} />
+          <Button size="huge" content="FAQ" onClick={() => this._onTaskSet(Task.FAQ)} />
+          <Button size="huge" content="AAOEQ" onClick={() => this._onTaskSet(Task.AAOEQ)} />
+          <Button size="huge" content="DT2DF" onClick={() => this._onTaskSet(Task.DT2DF)} />
         </div>
     }
 

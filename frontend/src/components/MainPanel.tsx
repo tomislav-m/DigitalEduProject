@@ -1,11 +1,13 @@
 import React from 'react';
 import { Button, Icon, Grid } from 'semantic-ui-react';
-import { Mode } from '../App';
-import Professor from '../containers/ProfessorPanelContainer';
-import Student from '../containers/StudentPanelContainer';
+import Professor from '../containers/FAQ/ProfessorPanelContainer';
+import Student from '../containers/FAQ/StudentPanelContainer';
+import { Task } from '../App';
+import FAQ from './FAQ/FAQ';
+import autobind from 'autobind-decorator';
 
 interface IMainPanelProps {
-  mode: Mode;
+  task: Task;
   onGoBack(): void;
 }
 
@@ -15,7 +17,7 @@ export default class MainPanel extends React.Component<IMainPanelProps, {}> {
   }
 
   public render() {
-    const { mode } = this.props;
+    const { task } = this.props;
 
     return (
       <Grid columns="3">
@@ -26,9 +28,12 @@ export default class MainPanel extends React.Component<IMainPanelProps, {}> {
         </Grid.Column>
         <Grid.Column width="13" >
           {
-            mode === Mode.professors ?
-              <Professor /> :
-              <Student />
+            task === Task.FAQ ?
+              <FAQ /> :
+              (task === Task.AAOEQ ?
+                <div></div> :
+                <div></div>
+              )
           }
         </Grid.Column>
         <Grid.Column width="1" />
