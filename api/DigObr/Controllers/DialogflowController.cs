@@ -42,6 +42,54 @@ namespace DigObr.Controllers
             return intent.FulfillmentText;
         }
 
+        // GET: api/Dialogflow/5
+        [System.Web.Http.HttpGet]
+        [ActionName("Check")]
+        public async Task<float> CheckAnswer(int subjectId, string question, string answer)
+        {
+            var intent = new QueryResult();
+            var subject = await db.Subjects.FindAsync(subjectId);
+            intent = await Ask(subject.Name+" Questions");
+            intent = await Ask(question);
+            intent = await Ask(answer);
+            if (intent.Intent.IsFallback)
+            {
+                return 0;
+            }
+            return intent.IntentDetectionConfidence;          
+        }
+
+        // GET: api/Dialogflow/5
+        [System.Web.Http.HttpGet]
+        [ActionName("Question")]
+        public async Task<string> GetQuestion(int subjectId, string question)
+        {
+            var intent = new QueryResult();
+            var subject = await db.Subjects.FindAsync(subjectId);
+            intent = await Ask(subject.Name + " Questions");
+            intent = await Ask(question);
+            if (intent.Intent.IsFallback)
+            {
+                return "Question not found!";
+            }
+            return intent.FulfillmentText;
+        }
+
+        // GET: api/Dialogflow/5
+        [System.Web.Http.HttpGet]
+        [ActionName("Num")]
+        public async Task<int> GetNumber(int subjectId)
+        {
+            var intent = new QueryResult();
+            var subject = await db.Subjects.FindAsync(subjectId);
+            intent = await Ask(subject.Name + " Questions");
+            if (intent.Intent.IsFallback)
+            {
+                return 0;
+            }
+            return Int32.Parse(intent.FulfillmentText);
+        }
+
         // POST: api/Dialogflow
         public void Post([FromBody]string value)
         {
