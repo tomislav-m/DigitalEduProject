@@ -1,7 +1,7 @@
 import React from 'react';
 import autobind from 'autobind-decorator';
 import ProfessorPanel from '../../components/FAQ/ProfessorPanel';
-import { getUnansweredQuestions, sendAnswer } from '../../actions/actions';
+import { getUnansweredQuestions, sendAnswer, sendAnswerDialogflow } from '../../actions/actions';
 import { QuestionPost } from '../../data/DataStructures';
 
 interface IProfessorState {
@@ -28,8 +28,10 @@ export default class ProfessorPanelContainer extends React.Component<{}, IProfes
 
   @autobind
   private _sendAnswer(question: QuestionPost, answer: string) {
-    sendAnswer(question, answer).then(() => {
-      this._getQuestions();
+    sendAnswerDialogflow(question.SubjectId, question.Text, answer).then(() => {
+      sendAnswer(question, answer).then(() => {
+        this._getQuestions();
+      });
     });
   }
 

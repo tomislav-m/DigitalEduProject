@@ -8,6 +8,7 @@ const answerUrl = "/answers/new";
 const editQuestionUrl = "/questions/edit/";
 const answeredQuestionsUrl = "/questions/answered?username=";
 const askQuestionUrl = "/dialogflow/ask?";
+const saveAnswerDialogflow = '/dialogflow/send';
 
 export function askQuestion(subjectId: number, question: string) {
   return genericFetch(askQuestionUrl + `subjectId=${subjectId}&question=${question}`);
@@ -55,6 +56,30 @@ export function sendAnswer(question: QuestionPost, answer: string) {
     .then(data => {
       question.AnswerId = data.Id;
       return editQuestion(question);
+    })
+    .catch(err => {
+      return err;
+    });
+}
+
+export function sendAnswerDialogflow(subjectId: number, question: string, answer: string) {
+  return fetch(saveAnswerDialogflow, {
+    method: "post",
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      subjectId: subjectId,
+      question: question,
+      answer: answer
+    })
+  })
+    .then(res => {
+      if (res.ok) {
+        return res.json();
+      }
+      throw new Error(res.statusText);
+    })
+    .then(data => {
+      return data;
     })
     .catch(err => {
       return err;

@@ -9,7 +9,7 @@ interface IProfessorProps {
 }
 
 interface IProfessorState {
-  modalOpen: boolean;
+  modalOpen: Array<boolean>;
   answer: string;
 }
 
@@ -18,7 +18,7 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
     super(props);
 
     this.state = {
-      modalOpen: false,
+      modalOpen: [false],
       answer: ''
     };
   }
@@ -32,15 +32,18 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
 
   @autobind
   private _handleModalClose() {
+    const modalOpen = this.state.modalOpen.map(x => x ? x = false : x);
     this.setState({
-      modalOpen: false
+      modalOpen
     });
   }
 
   @autobind
-  private _handleModalOpen() {
+  private _handleModalOpen(index: number) {
+    const modalOpen = this.state.modalOpen;
+    modalOpen[index] = true;
     this.setState({
-      modalOpen: true,
+      modalOpen,
       answer: ''
     });
   }
@@ -77,16 +80,16 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
   }
 
   @autobind
-  private _renderAnswerModal(question: QuestionPost | undefined) {
+  private _renderAnswerModal(question: QuestionPost | undefined, index: number) {
     return (
       <Modal
         size="small"
         trigger={
-          <Button floated="right" color="green" onClick={this._handleModalOpen}>
+          <Button floated="right" color="green" onClick={() => this._handleModalOpen(index)}>
             <Icon name="exclamation" /> Answer
           </Button>
         }
-        open={this.state.modalOpen}
+        open={this.state.modalOpen[index]}
         onClose={this._handleModalClose}
       >
         <Modal.Header>Answer</Modal.Header>
@@ -117,7 +120,7 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
               return (
                 <Segment key={index} className="question-center" clearing>
                   {q.Text}
-                  {this._renderAnswerModal(q)}
+                  {this._renderAnswerModal(q, index)}
                 </Segment>
               );
             })
