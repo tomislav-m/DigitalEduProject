@@ -8,6 +8,21 @@ const answerUrl = "/answers/new";
 const editQuestionUrl = "/questions/edit/";
 const answeredQuestionsUrl = "/questions/answered?username=";
 const askQuestionUrl = "/dialogflow/ask?";
+const checkQuestionUrl = "/dialogflow/check?";
+const getQuestionUrl = "/dialogflow/question?";
+const numQuestionUrl = "/dialogflow/num?";
+
+export function numQuestion(subjectId:number){
+  return genericFetch(numQuestionUrl+`subjectId=${subjectId}`);
+}
+
+export function getQuestion(subjectId: number, question: string){
+  return genericFetch(getQuestionUrl+`subjectId=${subjectId}&question=${question}`);
+}
+
+export function checkQuestion(subjectId: number, question: string, answer: string){
+  return genericFetch(checkQuestionUrl+`subjectId=${subjectId}&question=${question}&answer=${answer}`);
+}
 const saveAnswerDialogflow = '/dialogflow/send';
 
 export function askQuestion(subjectId: number, question: string) {
