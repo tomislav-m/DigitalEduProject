@@ -115,7 +115,7 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
       <Container className="question-center">
         {
           questions === undefined ?
-            <Loader active={true} size="big">Loading answers...</Loader> :
+            <Loader active={true} size="big">Loading questions...</Loader> :
             questions.map((q, index) => {
               return (
                 <Segment key={index} className="question-center" clearing>

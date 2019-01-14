@@ -2,7 +2,7 @@ import React from 'react';
 import { Subject } from '../../data/DataStructures';
 import autobind from 'autobind-decorator';
 import { getAllSubjectsAction, numQuestion, getQuestions, checkQuestion } from '../../actions/actions';
-import { DropdownProps, Dropdown, Input, Segment, Button, Icon } from 'semantic-ui-react';
+import { DropdownProps, Dropdown, Input, Segment, Button, Icon, Loader } from 'semantic-ui-react';
 
 interface Question {
   Id: string;
@@ -17,15 +17,14 @@ interface ITaskState {
   selectedSubject?: Subject;
   threshold: number;
   numberOfQuestions: number;
-  questions: Array<Question>;
+  questions?: Array<Question>;
 }
 
 export default class AAOEQ extends React.Component<{}, ITaskState> {
   public state: ITaskState = {
     subjects: [],
     threshold: 0.5,
-    numberOfQuestions: 0,
-    questions: []
+    numberOfQuestions: 0
   };
 
   public componentWillMount() {
@@ -50,6 +49,7 @@ export default class AAOEQ extends React.Component<{}, ITaskState> {
 
   @autobind
   private _onDropdownSelect(event: any, data: DropdownProps) {
+    this.setState({ questions: undefined });
     const subject = this.state.subjects.filter(x => x.Name === data.value)[0];
     if (subject) {
       this._onSubjectChange(subject.Id);
@@ -81,6 +81,7 @@ export default class AAOEQ extends React.Component<{}, ITaskState> {
 
   @autobind
   private _onAnswerChange(event: any, id: string) {
+    if (!this.state.questions) return;
     const questions = this.state.questions.slice();
     const question = questions.filter(x => x.Id === id)[0];
     question.Answer = event.target.value;
@@ -91,6 +92,7 @@ export default class AAOEQ extends React.Component<{}, ITaskState> {
 
   @autobind
   private _checkAnswer(id: string) {
+    if (!this.state.questions) return;
     const questions = this.state.questions.slice();
     const question = questions.filter(x => x.Id === id)[0];
     question.Loading = true;
@@ -122,7 +124,10 @@ export default class AAOEQ extends React.Component<{}, ITaskState> {
         <br />
         <Input type="range" min={0} max={10} onChange={this._onThresholdChange} />
         <span>{this.state.threshold}</span>
-        {this.state.questions.map(q => {
+        
+        {this.state.selectedSubject && this.state.questions === undefined ?
+          <Loader active={true} size="big">Loading questions...</Loader> :
+          this.state.questions && this.state.questions.map(q => {
           return (
             <Segment key={q.Id} clearing>
               {q.Question}
