@@ -16,8 +16,8 @@ export function numQuestion(subjectId:number){
   return genericFetch(numQuestionUrl+`subjectId=${subjectId}`);
 }
 
-export function getQuestion(subjectId: number, question: string){
-  return genericFetch(getQuestionUrl+`subjectId=${subjectId}&question=${question}`);
+export function getQuestions(subjectId: number){
+  return genericFetch(getQuestionUrl+`subjectId=${subjectId}`);
 }
 
 export function checkQuestion(subjectId: number, question: string, answer: string){

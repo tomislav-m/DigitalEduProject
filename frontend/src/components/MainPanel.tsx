@@ -5,6 +5,7 @@ import Student from '../containers/FAQ/StudentPanelContainer';
 import { Task } from '../App';
 import FAQ from './FAQ/FAQ';
 import autobind from 'autobind-decorator';
+import AAOEQ from './AAOEQ/AAOEQ';
 
 interface IMainPanelProps {
   task: Task;
@@ -31,7 +32,7 @@ export default class MainPanel extends React.Component<IMainPanelProps, {}> {
             task === Task.FAQ ?
               <FAQ /> :
               (task === Task.AAOEQ ?
-                <div></div> :
+                <AAOEQ /> :
                 <div></div>
               )
           }

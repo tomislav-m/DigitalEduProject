@@ -64,23 +64,27 @@ namespace DigObr.Controllers
         // GET: api/Dialogflow/5
         [System.Web.Http.HttpGet]
         [ActionName("Question")]
-        public async Task<string> GetQuestion(int subjectId, string question)
+        public async Task<List<SubjectQuestion>> GetQuestion(int subjectId)
         {
-            var intent = new QueryResult();
-            var subject = await db.Subjects.FindAsync(subjectId);
-            intent = await Ask(subject.Name + " Questions");
-            intent = await Ask(question);
-            if (intent.Intent.IsFallback)
+            var num = await GetNumber(subjectId);
+            var list = new List<SubjectQuestion>();
+            for (int i = 1; i <= num; ++i)
             {
-                return "Question not found!";
+                string id = "Q" + i;
+                var intent = new QueryResult();
+                var subject = await db.Subjects.FindAsync(subjectId);
+                intent = await Ask(subject.Name + " Questions");
+                intent = await Ask(id);
+                if (intent.Intent.IsFallback)
+                {
+                    continue;
+                }
+                list.Add(new SubjectQuestion { Id = id, Question = intent.FulfillmentText });
             }
-            return intent.FulfillmentText;
+            return list;
         }
-
-        // GET: api/Dialogflow/5
-        [System.Web.Http.HttpGet]
-        [ActionName("Num")]
-        public async Task<int> GetNumber(int subjectId)
+        
+        private async Task<int> GetNumber(int subjectId)
         {
             var intent = new QueryResult();
             var subject = await db.Subjects.FindAsync(subjectId);
@@ -189,6 +193,12 @@ namespace DigObr.Controllers
             public int SubjectId { get; set; }
             public string Question { get; set; }
             public string Answer { get; set; }
+        }
+
+        public class SubjectQuestion
+        {
+            public string Id { get; set; }
+            public string Question { get; set; }
         }
     }
 }
