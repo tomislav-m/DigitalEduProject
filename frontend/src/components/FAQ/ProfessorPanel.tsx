@@ -54,6 +54,11 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
   }
 
   @autobind
+  private _onTickPrimary(question: QuestionPost) {
+    question.Primary = !question.Primary;
+  }
+
+  @autobind
   private _renderResponseModal(question: QuestionPost | undefined) {
     const { onAnswer } = this.props;
     const { answer } = this.state;
@@ -95,7 +100,17 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
         <Modal.Header>Answer</Modal.Header>
         <Modal.Content>
           <Modal.Description>
-            <p className="description-text">{question && question.Text}</p>
+            {
+              question &&
+              <p className="description-text">
+                {question.Text}
+                {
+                  <span className="checkbox-primary">
+                    <Input type="checkbox" onChange={() => this._onTickPrimary(question)} input={question.Primary} title="primary" />
+                  </span>
+                }
+              </p>
+            }
           </Modal.Description>
           <Input placeholder="Answer..." size="big" fluid onChange={this._handleInputChange} />
         </Modal.Content>
@@ -115,7 +130,10 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
       <Container className="question-center">
         {
           questions === undefined ?
-            <Loader active={true} size="big">Loading questions...</Loader> :
+            <div>
+              <br />
+              <Loader active={true} size="big">Loading questions...</Loader>
+            </div> :
             questions.map((q, index) => {
               return (
                 <Segment key={index} className="question-center" clearing>

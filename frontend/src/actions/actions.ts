@@ -11,17 +11,38 @@ const askQuestionUrl = "/dialogflow/ask?";
 const checkQuestionUrl = "/dialogflow/check?";
 const getQuestionUrl = "/dialogflow/question?";
 const numQuestionUrl = "/dialogflow/num?";
+const confirmAnswerUrl = "/dialogflow/confirm";
 
-export function numQuestion(subjectId:number){
-  return genericFetch(numQuestionUrl+`subjectId=${subjectId}`);
+export function confirmAnswer(query: string) {
+  return fetch(confirmAnswerUrl, {
+    method: "post",
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(query)
+  })
+    .then(res => {
+      if (res.ok) {
+        return res.json();
+      }
+      throw new Error(res.statusText);
+    })
+    .then(data => {
+      return data;
+    })
+    .catch(err => {
+      return err;
+    });
 }
 
-export function getQuestions(subjectId: number){
-  return genericFetch(getQuestionUrl+`subjectId=${subjectId}`);
+export function numQuestion(subjectId: number) {
+  return genericFetch(numQuestionUrl + `subjectId=${subjectId}`);
 }
 
-export function checkQuestion(subjectId: number, question: string, answer: string){
-  return genericFetch(checkQuestionUrl+`subjectId=${subjectId}&question=${question}&answer=${answer}`);
+export function getQuestions(subjectId: number) {
+  return genericFetch(getQuestionUrl + `subjectId=${subjectId}`);
+}
+
+export function checkQuestion(subjectId: number, question: string, answer: string) {
+  return genericFetch(checkQuestionUrl + `subjectId=${subjectId}&question=${question}&answer=${answer}`);
 }
 const saveAnswerDialogflow = '/dialogflow/send';
 

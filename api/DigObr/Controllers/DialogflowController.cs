@@ -1,4 +1,5 @@
 ﻿using Google.Cloud.Dialogflow.V2;
+using Google.Protobuf.WellKnownTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -122,6 +123,39 @@ namespace DigObr.Controllers
             return Ok();
         }
 
+        [HttpPost]
+        [ActionName("Confirm")]
+        public async Task<IHttpActionResult> ConfirmAnswer([FromBody]string query)
+        {
+            IntentsClient intentsClient = await IntentsClient.CreateAsync();
+            var intent = (await Ask(query)).Intent;
+            intent = GetFullIntent(intent.IntentName);
+            var phrase = new TrainingPhrase
+            {
+                Name = Guid.NewGuid().ToString()
+            };
+            var part = new TrainingPhrase.Types.Part { Text = query };
+            phrase.Parts.Add(part);
+            intent.TrainingPhrases.Add(phrase);
+            var mask = new FieldMask();
+            mask.Paths.Add("training_phrases");
+            var req = new UpdateIntentRequest
+            {
+                Intent = intent,
+                LanguageCode = "en",
+                UpdateMask = mask
+            };
+            try
+            {
+                await intentsClient.UpdateIntentAsync(req);
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return Ok();
+        }
+
         // PUT: api/Dialogflow/5
         public void Put(int id, [FromBody]string value)
         {
@@ -181,7 +215,7 @@ namespace DigObr.Controllers
             var intent = new Intent
             {
                 ParentFollowupIntentName = indentId,
-                DisplayName = subject + " - " + question.Substring(1, question.Length / 3)
+                DisplayName = subject + " - " + question.Substring(0, question.Length / 3)
             };
             intent.Messages.Add(message);
             intent.TrainingPhrases.Add(phrase);

@@ -11,7 +11,7 @@ interface IStudentPanelProps {
   subjects: Array<Subject>;
   questions: Array<Question>;
   onGetAnswer(subjectId: number | undefined, question: string): void;
-  onAnswerAction(correct: boolean): void;
+  onAnswerAction(correct: boolean, query: string): void;
   onSubjectChange(subjectId: number): void;
   onAskQuestion(subjectId: number, text: string): void;
 }
@@ -55,9 +55,9 @@ export default class StudentPanel extends React.Component<IStudentPanelProps, IS
   }
 
   @autobind
-  private _onAnswer(isCorrect: boolean) {
+  private _onAnswer(isCorrect: boolean, question: string) {
     this._handleModalClose();
-    this.props.onAnswerAction(isCorrect);
+    this.props.onAnswerAction(isCorrect, question);
   }
 
   @autobind
@@ -116,10 +116,10 @@ export default class StudentPanel extends React.Component<IStudentPanelProps, IS
         {
           this.props.answer && this.props.answered &&
           <Modal.Actions>
-            <Button onClick={() => this._onAnswer(true)} color="green">
+            <Button onClick={() => this._onAnswer(true, this.state.question)} color="green">
               <Icon name="checkmark" /> Thanks
             </Button>
-            <Button onClick={() => this._onAnswer(false)} color="red">
+            <Button onClick={() => this._onAnswer(false, '')} color="red">
               <Icon name="checkmark" /> This is not the answer I'm looking for
             </Button>
           </Modal.Actions>
@@ -148,7 +148,7 @@ export default class StudentPanel extends React.Component<IStudentPanelProps, IS
           </Modal.Description>
         </Modal.Content>
         <Modal.Actions>
-          <Button color="green" onClick={() => this._onAnswer(true)}>
+          <Button color="green" onClick={() => this._onAnswer(true, '')}>
             <Icon name="checkmark" /> Got it!
             </Button>
         </Modal.Actions>
@@ -229,7 +229,7 @@ export default class StudentPanel extends React.Component<IStudentPanelProps, IS
                   </Modal.Content>
                   <Modal.Actions>
                     {this._renderQuestionSent()}
-                    <Button onClick={() => this._onAnswer(true)} color="red">
+                    <Button onClick={() => this._onAnswer(true, '')} color="red">
                       <Icon name="cancel" /> Cancel
                 </Button>
                   </Modal.Actions>

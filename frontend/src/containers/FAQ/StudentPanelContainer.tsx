@@ -1,7 +1,7 @@
 import React from 'react';
 import autobind from 'autobind-decorator';
 import StudentPanel from '../../components/FAQ/StudentPanel';
-import { getAllSubjectsAction, getQuestionsAndAnswers, sendQuestion, askQuestion } from '../../actions/actions';
+import { getAllSubjectsAction, getQuestionsAndAnswers, sendQuestion, askQuestion, confirmAnswer } from '../../actions/actions';
 import '../../components/FAQ/styles.css';
 import { Subject, Question, QuestionPost } from '../../data/DataStructures';
 
@@ -44,7 +44,8 @@ export default class StudentPanelContainer extends React.Component<{}, IStudentS
   }
 
   @autobind
-  private _markAnswer(isCorrect: boolean) {
+  private _markAnswer(isCorrect: boolean, query: string) {
+    isCorrect && query.length > 0 && confirmAnswer(query);
     this.setState({
       isAnswerWrong: !isCorrect,
       answered: false

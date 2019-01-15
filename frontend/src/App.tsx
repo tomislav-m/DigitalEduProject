@@ -17,8 +17,7 @@ interface IAppState {
 
 export enum Task {
   'FAQ' = 1,
-  'AAOEQ' = 2,
-  'DT2DF' = 3
+  'AAOEQ' = 2
 }
 
 interface UserData {
@@ -126,7 +125,6 @@ class App extends React.Component<{}, IAppState> {
         <div className="loginButton">
           <Button size="huge" content="FAQ" onClick={() => this._onTaskSet(Task.FAQ)} />
           <Button size="huge" content="AAOEQ" onClick={() => this._onTaskSet(Task.AAOEQ)} />
-          <Button size="huge" content="DT2DF" onClick={() => this._onTaskSet(Task.DT2DF)} />
         </div>
     }
 
