@@ -12,6 +12,7 @@ const checkQuestionUrl = "/dialogflow/check?";
 const getQuestionUrl = "/dialogflow/question?";
 const numQuestionUrl = "/dialogflow/num?";
 const confirmAnswerUrl = "/dialogflow/confirm";
+const markAsSeenUrl = "/questions/markasseen";
 
 export function confirmAnswer(query: string) {
   return fetch(confirmAnswerUrl, {
@@ -64,6 +65,14 @@ export function getUnansweredQuestions(subjectId?: number) {
 
 export function getNotifications(username: string) {
   return genericFetch(answeredQuestionsUrl, username);
+}
+
+export function dismissNotification(id: number) {
+  return fetch(markAsSeenUrl, {
+    method: "put",
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(id)
+  });
 }
 
 export function sendQuestion(question: any) {

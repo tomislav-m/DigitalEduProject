@@ -6,10 +6,14 @@ import { Task } from '../App';
 import FAQ from './FAQ/FAQ';
 import autobind from 'autobind-decorator';
 import AAOEQ from './AAOEQ/AAOEQ';
+import { Question } from '../data/DataStructures';
+import NotificationScreen from './FAQ/NotificationScreen';
 
 interface IMainPanelProps {
   task: Task;
+  notifications: Array<any>;
   onGoBack(): void;
+  onNotificationDismiss(): void;
 }
 
 export default class MainPanel extends React.Component<IMainPanelProps, {}> {
@@ -33,7 +37,7 @@ export default class MainPanel extends React.Component<IMainPanelProps, {}> {
               <FAQ /> :
               (task === Task.AAOEQ ?
                 <AAOEQ /> :
-                <div></div>
+                <NotificationScreen notifications={this.props.notifications} onNotificationDismiss={this.props.onNotificationDismiss} />
               )
           }
         </Grid.Column>

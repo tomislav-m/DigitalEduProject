@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web.Http;
 using DigObr.Models;
 
@@ -45,15 +46,25 @@ namespace DigObr.Controllers
                                                                                  where u.Username == username
                                                                                  select u.Id).FirstOrDefault()
                                           select new QuestionAndAnswer() { Answer = a.Text, Question = q.Text, AnswerId = a.Id, QuestionId = q.Id }).ToList();
-            foreach (var item in qa)
-            {
-                Question q = db.Questions.Find(item.QuestionId);
-                q.Seen = true;
-                db.Entry(q).State = EntityState.Modified;
-            }
-            db.SaveChanges();
+            //foreach (var item in qa)
+            //{
+            //    Question q = db.Questions.Find(item.QuestionId);
+            //    q.Seen = true;
+            //    db.Entry(q).State = EntityState.Modified;
+            //}
+            //db.SaveChanges();
             
             return qa.AsQueryable();
+        }
+
+        [HttpPut]
+        [ActionName("MarkAsSeen")]
+        public async Task MarkAnswerAsRead([FromBody]int id)
+        {
+            var question = await db.Questions.FindAsync(id);
+            question.Seen = true;
+            db.Entry(question).State = EntityState.Modified;
+            await db.SaveChangesAsync();
         }
         
         //[ResponseType(typeof(Question))]

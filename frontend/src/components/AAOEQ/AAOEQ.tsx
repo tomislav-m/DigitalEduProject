@@ -3,6 +3,7 @@ import { Subject } from '../../data/DataStructures';
 import autobind from 'autobind-decorator';
 import { getAllSubjectsAction, numQuestion, getQuestions, checkQuestion } from '../../actions/actions';
 import { DropdownProps, Dropdown, Input, Segment, Button, Icon, Loader } from 'semantic-ui-react';
+import './styles.css';
 
 interface Question {
   Id: string;
@@ -34,6 +35,7 @@ export default class AAOEQ extends React.Component<{}, ITaskState> {
   @autobind
   private _getSubjects() {
     getAllSubjectsAction().then((subjects: Array<Subject>) => {
+      subjects = subjects.filter(x => x.Name != "General");
       this.setState({ subjects });
     });
   }
@@ -131,8 +133,8 @@ export default class AAOEQ extends React.Component<{}, ITaskState> {
           return (
             <Segment key={q.Id} clearing>
               {q.Question}
-              <br />
-              <Input onChange={() => this._onAnswerChange(event, q.Id)} input={q.Answer} />
+              <br /><br />
+              <Input onChange={() => this._onAnswerChange(event, q.Id)} input={q.Answer} className="answer-input" />
               <Button floated="right" color="green" onClick={() => this._checkAnswer(q.Id)} loading={q.Loading}>
                 Check
               </Button>

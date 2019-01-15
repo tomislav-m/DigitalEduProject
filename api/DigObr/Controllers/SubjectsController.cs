@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
@@ -13,9 +14,10 @@ namespace DigObr.Controllers
         private Db db = new Db();
         
         [ActionName("All")]
-        public IQueryable<Subject> GetSubjects()
+        public IEnumerable<Subject> GetSubjects()
         {
-            return db.Subjects;
+            var list = db.Subjects.OrderByDescending(x => x.Name == "General").ThenBy(x => x.Name).ToList();
+            return list;
         }
 
         // GET: api/Subjects/5

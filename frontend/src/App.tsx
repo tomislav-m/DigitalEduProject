@@ -12,12 +12,13 @@ interface IAppState {
   isLoggedIn: boolean;
   task?: Task;
   user?: UserData;
-  questions: Array<Question>;
+  notifications: Array<any>;
 }
 
 export enum Task {
   'FAQ' = 1,
-  'AAOEQ' = 2
+  'AAOEQ' = 2,
+  'notifications' = 3
 }
 
 interface UserData {
@@ -32,7 +33,7 @@ interface UserData {
 class App extends React.Component<{}, IAppState> {
   public state: IAppState = {
     isLoggedIn: false,
-    questions: []
+    notifications: []
   };
 
   public componentDidUpdate({ }, prevState: IAppState) {
@@ -70,15 +71,15 @@ class App extends React.Component<{}, IAppState> {
   private _getNotifications() {
     this.state.user && getNotifications(this.state.user.mail.toLocaleLowerCase()).then(notifications => {
       this.setState({
-        questions: notifications
+        notifications
       });
     });
   }
 
   @autobind
   private _renderNavigation() {
-    const { isLoggedIn, user, questions } = this.state;
-    const message = `${questions.length > 0 ? questions.length + " new" : "No new"} answers to your questions`;
+    const { isLoggedIn, user, notifications } = this.state;
+    const message = `${notifications.length > 0 ? notifications.length + " new" : "No new"} answers to your questions`;
     return (
       <div>
         <Menu fixed="top" inverted>
@@ -93,7 +94,7 @@ class App extends React.Component<{}, IAppState> {
                   basic
                   content={message}
                   trigger={
-                    <Button className="notification-button">{questions.length}</Button>
+                    <Button className="notification-button" onClick={() => this._onTaskSet(Task.notifications)}>{notifications.length}</Button>
                   }
                 />
               </Menu.Item>
@@ -105,7 +106,7 @@ class App extends React.Component<{}, IAppState> {
   }
 
   render() {
-    const { isLoggedIn, task } = this.state;
+    const { isLoggedIn, task, notifications } = this.state;
     let content: any;
 
     if (!isLoggedIn) {
@@ -119,7 +120,7 @@ class App extends React.Component<{}, IAppState> {
         </div>
     } else if (task) {
       content =
-        <MainPanel onGoBack={this._resetTask} task={task} />;
+        <MainPanel onGoBack={this._resetTask} task={task} notifications={notifications} onNotificationDismiss={this._getNotifications} />;
     } else {
       content =
         <div className="loginButton">
