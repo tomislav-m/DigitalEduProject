@@ -123,7 +123,9 @@ namespace DigObr.Controllers
             
             db.Questions.Add(question);
             db.SaveChanges();
-            
+            Query.SendToProfessor(db.Subjects.Find(question.SubjectId).Name, question.Text);
+
+
             return CreatedAtRoute("DefaultApi", new { id = question.Id }, question);
         }
 

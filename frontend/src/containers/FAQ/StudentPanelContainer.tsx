@@ -44,8 +44,8 @@ export default class StudentPanelContainer extends React.Component<{}, IStudentS
   }
 
   @autobind
-  private _markAnswer(isCorrect: boolean, query: string) {
-    isCorrect && query.length > 0 && confirmAnswer(query);
+  private _markAnswer(isCorrect: boolean, query: string, subjectId: number) {
+    isCorrect && query.length > 0 && confirmAnswer(query, subjectId);
     this.setState({
       isAnswerWrong: !isCorrect,
       answered: false

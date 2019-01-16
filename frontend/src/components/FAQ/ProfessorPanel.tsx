@@ -1,16 +1,19 @@
 import React from 'react';
-import { Container, Segment, Button, Icon, Loader, Modal, Input } from 'semantic-ui-react';
-import { QuestionPost } from '../../data/DataStructures';
+import { Container, Segment, Button, Icon, Loader, Modal, Input, Dropdown, DropdownProps } from 'semantic-ui-react';
+import { QuestionPost, Question } from '../../data/DataStructures';
 import autobind from 'autobind-decorator';
+import { getQuestions, getQuestionsAndAnswers } from '../../actions/actions';
 
 interface IProfessorProps {
   questions?: Array<QuestionPost>;
-  onAnswer(question: QuestionPost | undefined, answer: string): void;
+  onAnswer(question: QuestionPost | undefined, answer: string, existing: boolean): void;
 }
 
 interface IProfessorState {
   modalOpen: Array<boolean>;
   answer: string;
+  existingAnswer: boolean;
+  questionsAndAnswers: Array<any>;
 }
 
 export default class ProfessorPanel extends React.Component<IProfessorProps, IProfessorState> {
@@ -19,7 +22,9 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
 
     this.state = {
       modalOpen: [false],
-      answer: ''
+      answer: '',
+      existingAnswer: false,
+      questionsAndAnswers: []
     };
   }
 
@@ -27,6 +32,14 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
   private _handleInputChange(event: any) {
     this.setState({
       answer: event.target.value
+    });
+  }
+
+  @autobind
+  private _onDropdownSelect(event: any, data: DropdownProps) {
+    const answer = data.value as string;
+    this.setState({
+      answer
     });
   }
 
@@ -39,7 +52,8 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
   }
 
   @autobind
-  private _handleModalOpen(index: number) {
+  private _handleModalOpen(index: number, subjectId: number) {
+    this._getAnswers(subjectId);
     const modalOpen = this.state.modalOpen;
     modalOpen[index] = true;
     this.setState({
@@ -59,13 +73,42 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
   }
 
   @autobind
+  private _onChangeInputType() {
+    const existingAnswer = !this.state.existingAnswer;
+    this.setState({
+      existingAnswer
+    });
+  }
+
+  @autobind
+  private _mapAnswersToOptions() {
+    const options = this.state.questionsAndAnswers.map((question: any) => {
+      return {
+        key: question.QuestionId,
+        text: question.Answer,
+        value: question.Answer
+      };
+    });
+    return options;
+  }
+
+  @autobind
+  private _getAnswers(id: number) {
+    getQuestionsAndAnswers(id).then((questions) => {
+      this.setState({
+        questionsAndAnswers: questions
+      });
+    });
+  }
+
+  @autobind
   private _renderResponseModal(question: QuestionPost | undefined) {
     const { onAnswer } = this.props;
     const { answer } = this.state;
     return (
       <Modal
         size='small'
-        trigger={<Button color="green" onClick={() => onAnswer(question, answer)}><Icon name="send" /> Send</Button>}
+        trigger={<Button color="green" onClick={() => onAnswer(question, answer, this.state.existingAnswer)}><Icon name="send" /> Send</Button>}
       >
         <Modal.Header>Answer sent</Modal.Header>
         <Modal.Content>
@@ -90,7 +133,7 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
       <Modal
         size="small"
         trigger={
-          <Button floated="right" color="green" onClick={() => this._handleModalOpen(index)}>
+          <Button floated="right" color="green" onClick={() => this._handleModalOpen(index, question!.SubjectId)}>
             <Icon name="exclamation" /> Answer
           </Button>
         }
@@ -112,7 +155,22 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
               </p>
             }
           </Modal.Description>
-          <Input placeholder="Answer..." size="big" fluid onChange={this._handleInputChange} />
+          {
+            !this.state.existingAnswer &&
+            <Input placeholder="Answer..." size="medium" fluid onChange={this._handleInputChange} type="" />
+          }
+          {
+            this.state.existingAnswer &&
+            <Dropdown
+              placeholder="Answer..."
+              search selection fluid
+              options={this._mapAnswersToOptions()}
+              onChange={this._onDropdownSelect}
+            />
+          }
+          <Button color="blue" onClick={this._onChangeInputType}>
+            <Icon name="exchange" /> { this.state.existingAnswer ? "Type your answer" : "Pick existing answer"}
+          </Button>
         </Modal.Content>
         <Modal.Actions>
           {this._renderResponseModal(question)}
@@ -137,7 +195,7 @@ export default class ProfessorPanel extends React.Component<IProfessorProps, IPr
             questions.map((q, index) => {
               return (
                 <Segment key={index} className="question-center" clearing>
-                  {q.Text}
+                  {q.Text} ({(q as any).Subject.Name})
                   {this._renderAnswerModal(q, index)}
                 </Segment>
               );

@@ -53,14 +53,14 @@ namespace DigObr.Models
             Answer = jObject["result"]["fulfillment"]["speech"].ToString();
         }
         
-        private void SendToProfessor()
+        public static void SendToProfessor(string subjectP, string question)
         {
             var fromAddress = new MailAddress("digitalnoobrazovanje@gmail.com");
             var fromPassword = "digobr1234";
-            var toAddress = new MailAddress("f.mutnjakovic@gmail.com");
+            var toAddress = new MailAddress("tomislav.maslac95@gmail.com");
 
-            string subject = "Neodgovoreno pitajne";
-            string body = Question;
+            string subject = "New question  - " + subjectP;
+            string body = question;
 
             SmtpClient smtp = new SmtpClient
             {
@@ -70,7 +70,6 @@ namespace DigObr.Models
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 UseDefaultCredentials = false,
                 Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
-
             };
 
             using (var message = new MailMessage(fromAddress, toAddress)
@@ -79,7 +78,7 @@ namespace DigObr.Models
                 Body = body
             })
             smtp.Send(message);
-            Answer = "Question sent to professor.";
+            //Answer = "Question sent to professor.";
         }
     }
 }

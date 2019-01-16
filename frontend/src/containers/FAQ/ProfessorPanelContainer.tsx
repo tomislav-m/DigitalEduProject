@@ -5,12 +5,12 @@ import { getUnansweredQuestions, sendAnswer, sendAnswerDialogflow } from '../../
 import { QuestionPost } from '../../data/DataStructures';
 
 interface IProfessorState {
-  questions?: Array<QuestionPost>;
+  unansweredQuestions?: Array<QuestionPost>;
 }
 
 export default class ProfessorPanelContainer extends React.Component<{}, IProfessorState> {
   public state: IProfessorState = {
-    questions: undefined
+    unansweredQuestions: undefined
   }
 
   public componentDidMount() {
@@ -19,16 +19,16 @@ export default class ProfessorPanelContainer extends React.Component<{}, IProfes
 
   @autobind
   private _getQuestions() {
-    getUnansweredQuestions().then(questions => {
+    getUnansweredQuestions().then(unansweredQuestions => {
       this.setState({
-        questions
+        unansweredQuestions
       });
     });
   }
 
   @autobind
-  private _sendAnswer(question: QuestionPost, answer: string) {
-    sendAnswerDialogflow(question.SubjectId, question.Text, answer).then(() => {
+  private _sendAnswer(question: QuestionPost, answer: string, existing: boolean) {
+    sendAnswerDialogflow(question.SubjectId, question.Text, answer, existing).then(() => {
       sendAnswer(question, answer).then(() => {
         this._getQuestions();
       });
@@ -38,7 +38,7 @@ export default class ProfessorPanelContainer extends React.Component<{}, IProfes
   public render() {
     return (
       <ProfessorPanel
-        questions={this.state.questions}
+        questions={this.state.unansweredQuestions}
         onAnswer={this._sendAnswer}
       />
     );

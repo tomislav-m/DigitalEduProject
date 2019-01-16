@@ -34,6 +34,9 @@ namespace DigObr.Controllers
         [ActionName("Ask")]
         public async Task<string> Get(int subjectId, string question)
         {
+            sessionsClient = SessionsClient.Create();
+            var uid = Guid.NewGuid().ToString();
+            session = new SessionName("digobr", uid);
             var intent = new QueryResult();
             var subject = await db.Subjects.FindAsync(subjectId);
             intent = await Ask(subject.Name);
@@ -102,14 +105,21 @@ namespace DigObr.Controllers
         public async Task<IHttpActionResult> Post([FromBody]Dialogflow dialogflow)
         {
             var subject = await db.Subjects.FindAsync(dialogflow.SubjectId);
+            if (dialogflow.Existing)
+            {
+                var answerId = db.Answers.FirstOrDefault(x => x.Text == dialogflow.Answer).Id;
+                var question = db.Questions.FirstOrDefault(x => x.AnswerId == answerId).Text;
+
+                return await ConfirmAnswer2(question, dialogflow.Question, subject.Name);
+            }
             IntentsClient intentsClient = await IntentsClient.CreateAsync();
-            var intentId = intentsClient.ListIntents(new ProjectAgentName("digobr")).SingleOrDefault(x => x.DisplayName == subject.Name).Name;
+            var intent = intentsClient.ListIntents(new ProjectAgentName("digobr")).SingleOrDefault(x => x.DisplayName == subject.Name);
             //var parentIntent = await intentsClient.GetIntentAsync(new IntentName("digobr", subject.Name));
-            
+
             var req = new CreateIntentRequest
             {
                 ParentAsProjectAgentName = new ProjectAgentName("digobr"),
-                Intent = CreateNewIntent(dialogflow.Question, dialogflow.Answer, subject.Name, intentId),
+                Intent = CreateNewIntent(dialogflow.Question, dialogflow.Answer, subject.Name, intent),
                 LanguageCode = "en"
             };
             try
@@ -125,16 +135,50 @@ namespace DigObr.Controllers
 
         [HttpPost]
         [ActionName("Confirm")]
-        public async Task<IHttpActionResult> ConfirmAnswer([FromBody]string query)
+        public async Task<IHttpActionResult> ConfirmAnswer([FromBody]Dialogflow dialogflow)
         {
             IntentsClient intentsClient = await IntentsClient.CreateAsync();
+            var subject = await db.Subjects.FindAsync(dialogflow.SubjectId);
+            await Ask(subject.Name);
+            var intent = (await Ask(dialogflow.Question)).Intent;
+            intent = GetFullIntent(intent.IntentName);
+            var phrase = new TrainingPhrase
+            {
+                Name = Guid.NewGuid().ToString()
+            };
+            var part = new TrainingPhrase.Types.Part { Text = dialogflow.Question };
+            phrase.Parts.Add(part);
+            intent.TrainingPhrases.Add(phrase);
+            var mask = new FieldMask();
+            mask.Paths.Add("training_phrases");
+            var req = new UpdateIntentRequest
+            {
+                Intent = intent,
+                LanguageCode = "en",
+                UpdateMask = mask
+            };
+            try
+            {
+                await intentsClient.UpdateIntentAsync(req);
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return Ok();
+        }
+
+        public async Task<IHttpActionResult> ConfirmAnswer2(string query, string question, string subject)
+        {
+            IntentsClient intentsClient = await IntentsClient.CreateAsync();
+            await Ask(subject);
             var intent = (await Ask(query)).Intent;
             intent = GetFullIntent(intent.IntentName);
             var phrase = new TrainingPhrase
             {
                 Name = Guid.NewGuid().ToString()
             };
-            var part = new TrainingPhrase.Types.Part { Text = query };
+            var part = new TrainingPhrase.Types.Part { Text = question };
             phrase.Parts.Add(part);
             intent.TrainingPhrases.Add(phrase);
             var mask = new FieldMask();
@@ -166,7 +210,7 @@ namespace DigObr.Controllers
         {
         }
 
-        private static async Task<QueryResult> Ask(string query, IntentView intentView = IntentView.Unspecified)
+        private static async Task<QueryResult> Ask(string query)
         {
             QueryInput queryInput = new QueryInput();
             var textInput = new TextInput
@@ -198,7 +242,7 @@ namespace DigObr.Controllers
             return fullIntent;
         }
 
-        private static Intent CreateNewIntent(string question, string response, string subject, string indentId)
+        private static Intent CreateNewIntent(string question, string response, string subject, Intent intent)
         {
             var text = new Text();
             text.Text_.Add(response);
@@ -212,14 +256,15 @@ namespace DigObr.Controllers
             };
             var part = new TrainingPhrase.Types.Part { Text = question };
             phrase.Parts.Add(part);
-            var intent = new Intent
+            var intent2 = new Intent
             {
-                ParentFollowupIntentName = indentId,
-                DisplayName = subject + " - " + question.Substring(0, question.Length / 3)
+                ParentFollowupIntentName = intent.Name,
+                DisplayName = subject + " - " + Guid.NewGuid().ToString()
             };
-            intent.Messages.Add(message);
-            intent.TrainingPhrases.Add(phrase);
-            return intent;
+            intent2.InputContextNames.Add(intent.OutputContexts.FirstOrDefault().Name);
+            intent2.Messages.Add(message);
+            intent2.TrainingPhrases.Add(phrase);
+            return intent2;
         }
 
         public class Dialogflow
@@ -227,6 +272,7 @@ namespace DigObr.Controllers
             public int SubjectId { get; set; }
             public string Question { get; set; }
             public string Answer { get; set; }
+            public bool Existing { get; set; }
         }
 
         public class SubjectQuestion

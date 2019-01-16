@@ -11,7 +11,7 @@ interface IStudentPanelProps {
   subjects: Array<Subject>;
   questions: Array<Question>;
   onGetAnswer(subjectId: number | undefined, question: string): void;
-  onAnswerAction(correct: boolean, query: string): void;
+  onAnswerAction(correct: boolean, query: string, subjectId: number): void;
   onSubjectChange(subjectId: number): void;
   onAskQuestion(subjectId: number, text: string): void;
 }
@@ -57,7 +57,7 @@ export default class StudentPanel extends React.Component<IStudentPanelProps, IS
   @autobind
   private _onAnswer(isCorrect: boolean, question: string) {
     this._handleModalClose();
-    this.props.onAnswerAction(isCorrect, question);
+    this.props.onAnswerAction(isCorrect, question, this.state.selectedSubject!.Id);
   }
 
   @autobind

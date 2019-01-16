@@ -14,11 +14,14 @@ const numQuestionUrl = "/dialogflow/num?";
 const confirmAnswerUrl = "/dialogflow/confirm";
 const markAsSeenUrl = "/questions/markasseen";
 
-export function confirmAnswer(query: string) {
+export function confirmAnswer(query: string, subjectId: number) {
   return fetch(confirmAnswerUrl, {
     method: "post",
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(query)
+    body: JSON.stringify({
+      question: query,
+      subjectId
+    })
   })
     .then(res => {
       if (res.ok) {
@@ -107,14 +110,15 @@ export function sendAnswer(question: QuestionPost, answer: string) {
     });
 }
 
-export function sendAnswerDialogflow(subjectId: number, question: string, answer: string) {
+export function sendAnswerDialogflow(subjectId: number, question: string, answer: string, existing: boolean) {
   return fetch(saveAnswerDialogflow, {
     method: "post",
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       subjectId: subjectId,
       question: question,
-      answer: answer
+      answer: answer,
+      existing
     })
   })
     .then(res => {
